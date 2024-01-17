@@ -18,16 +18,19 @@
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 static const struct gpio_dt_spec led_proto = GPIO_DT_SPEC_GET(LED1_NODE, gpios);
 static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(BUTTON_NODE, gpios);
+static struct gpio_callback button_callback;
 
-static void button_handler(struct input_event *evt) {
+static void button_handler(const struct device *port,
+        struct gpio_callback *cb,
+        gpio_port_pins_t pins) {
+    printk("Button Handler\n");
     gpio_pin_toggle_dt(&led);
     gpio_pin_toggle_dt(&led_proto);
 }
 
-INPUT_CALLBACK_DEFINE(NULL, button_handler);
-
 int main(void) {
     int err;
+    printk("Hello\n");
 
 	if (!gpio_is_ready_dt(&led)) {
 		return 0;
@@ -42,12 +45,24 @@ int main(void) {
 		return 0;
 	}
 
-	err = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
+	err = gpio_pin_interrupt_configure_dt(&button, GPIO_INT_EDGE_TO_ACTIVE);
 	if (err < 0) {
 		return 0;
 	}
 
-	err = gpio_pin_configure_dt(&led_proto, GPIO_OUTPUT_ACTIVE);
+	gpio_init_callback(&button_callback, button_handler, BIT(button.pin));
+
+	err = gpio_add_callback_dt(&button, &button_callback);
+	if (err < 0) {
+		return 0;
+	}
+
+	err = gpio_pin_configure_dt(&led, GPIO_OUTPUT_INACTIVE);
+	if (err < 0) {
+		return 0;
+	}
+
+	err = gpio_pin_configure_dt(&led_proto, GPIO_OUTPUT_INACTIVE);
 	if (err < 0) {
 		return 0;
 	}
