@@ -33,17 +33,21 @@ int main(void) {
 		return 0;
 	}
 
+	if (!gpio_is_ready_dt(&button)) {
+		return 0;
+	}
+
+	err = gpio_pin_configure_dt(&button, GPIO_INPUT);
+	if (err < 0) {
+		return 0;
+	}
+
 	err = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
 	if (err < 0) {
 		return 0;
 	}
 
 	err = gpio_pin_configure_dt(&led_proto, GPIO_OUTPUT_ACTIVE);
-	if (err < 0) {
-		return 0;
-	}
-
-	err = gpio_pin_configure_dt(&button, GPIO_INPUT);
 	if (err < 0) {
 		return 0;
 	}
