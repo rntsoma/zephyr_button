@@ -26,6 +26,7 @@ static int last_read = 0;
 static void button_handler(const struct device *port,
         struct gpio_callback *cb,
         gpio_port_pins_t pins) {
+
     printk("Button Handler\n");
     if (gpio_pin_get_dt(&button)) {
         printk("Pressed\n");
@@ -75,15 +76,6 @@ int main(void) {
 	if (err < 0) {
 		return 0;
 	}
-
-    while (true) {
-		/* BEGIN */
-		/* END */
-
-        /* gpio_pin_toggle_dt(&led); */
-        /* gpio_pin_toggle_dt(&led_proto); */
-        /* k_msleep(2000); */
-}
 
     return 0;
 }
