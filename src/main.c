@@ -15,17 +15,26 @@
 #define LED1_NODE DT_ALIAS(led1)
 #define BUTTON_NODE DT_ALIAS(button0)
 
+#define DEBOUNCE_DELAY 50
+
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 static const struct gpio_dt_spec led_proto = GPIO_DT_SPEC_GET(LED1_NODE, gpios);
 static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(BUTTON_NODE, gpios);
 static struct gpio_callback button_callback;
+static int last_read = 0;
 
 static void button_handler(const struct device *port,
         struct gpio_callback *cb,
         gpio_port_pins_t pins) {
     printk("Button Handler\n");
-    gpio_pin_toggle_dt(&led);
-    gpio_pin_toggle_dt(&led_proto);
+    if (gpio_pin_get_dt(&button)) {
+        printk("Pressed\n");
+        if (k_uptime_get() - last_read >= DEBOUNCE_DELAY) {
+            gpio_pin_toggle_dt(&led);
+            gpio_pin_toggle_dt(&led_proto);
+        }
+        last_read = k_uptime_get();
+    }
 }
 
 int main(void) {
