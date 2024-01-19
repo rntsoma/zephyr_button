@@ -29,8 +29,8 @@ static void button_handler(const struct device *port,
 
     printk("Button Handler\n");
     if (gpio_pin_get_dt(&button)) {
-        printk("Pressed\n");
         if (k_uptime_get() - last_read >= DEBOUNCE_DELAY) {
+            printk("Pressed\n");
             gpio_pin_toggle_dt(&led);
             gpio_pin_toggle_dt(&led_proto);
         }
@@ -43,6 +43,10 @@ int main(void) {
     printk("Hello\n");
 
 	if (!gpio_is_ready_dt(&led)) {
+		return 0;
+	}
+
+	if (!gpio_is_ready_dt(&led_proto)) {
 		return 0;
 	}
 
